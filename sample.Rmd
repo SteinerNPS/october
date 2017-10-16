@@ -1,0 +1,87 @@
+---
+title: "Statistical Inference Course Project - Part 1"
+author: "Michael Steiner"
+date: "October 11, 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview 
+This project investigate the exponential distribution in R and compare it to the Central limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. Lambda is set to 0.2 for all simulations. This report will investigate the distribution of averages of 40 exponentials for 1000 simulations.
+
+
+## Simulation
+
+```{r set_known}
+set.seed(22)
+lambda <- 0.2
+exp <- 40
+simulations <- 1000
+```
+With lambda set to ```r lambda ```, the exponential distribution and the standard deviation are both ```r 1/lambda```. 
+
+```{r simulation}
+sim_means <- c()
+for (i in 1:simulations){
+  sim_means <- c(sim_means, mean(rexp(exp, lambda)))
+}
+
+```
+
+## Sample Mean versus Theoretical Mean
+
+The sample mean is ```r round(mean(sim_means), digits = 3)``` compared to the theoretical mean of ```r 1/lambda```. This is a difference of ```r round(100*((1/lambda)-mean(sim_means))/(1/lambda), digits = 2)```%
+```{r theoretical_mean}
+hist(sim_means, 
+    breaks = 50, 
+    prob = TRUE, 
+    main="Sample Mean vs Theorectical Mean", 
+    xlab="Simulation Mean")
+
+abline(v = mean(sim_means), col= 'blue',lwd = 2)
+abline(v = 1/lambda, col = 'red',lwd = 2)
+
+legend('topright', c("Sample Mean", "Theoretical Mean"),bty = "n", lty = c(1,1), col = c(col = 'blue', col = 'red'))
+
+```
+
+## sample Variance vs Theoretical Variance
+The varience of the sample is an estimate of the variance of the population using the number of samples.  
+
+```{r varience}
+
+sample_var <- var(sim_means)
+pop_var<- (1/lambda)^2/40
+```
+
+The population variance is ```r pop_var``` and the sample variance is ```r sample_var```.
+
+```{r theoretical_variance}
+hist(sim_means, 
+    breaks = 50, 
+    prob = TRUE, 
+    main="Sample Variance vs Theorectical Variance", 
+    xlab="Simulation Mean")
+
+
+legend('topright', c("Sample Mean", "Theoretical Mean"), bty = "n", lwd = c(2,2), col = c(col = 'red', col = 'blue'))
+
+lines(density(sim_means), col = 'red', lwd = 2)
+xfit <- seq(min(sim_means), max(sim_means), length = 50)
+yfit <- dnorm(xfit, mean = 1/lambda, sd = (1/lambda/sqrt(40)))
+lines(xfit, yfit, col = 'blue', lwd = 2)
+
+```
+
+
+## Distribution
+A Q-Q plot compares the simulated quantiles to theortical quantiles. The closer the points are to the qqline, the closer the distribution is to normal. The below plot shows the distribution is normal. 
+```{r distribution}
+qqnorm(sim_means)
+qqline(sim_means)
+```

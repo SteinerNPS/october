@@ -1,0 +1,54 @@
+---
+title: "Basic Inferential Data Analysis Instructions"
+author: "Michael Steiner"
+date: "October 12, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Data
+####Description
+The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
+
+####Format
+A data frame with 60 observations on 3 variables.
+[,1] len numeric Tooth length
+[,2] supp factor Supplement type (VC or OJ).
+[,3] dose numeric Dose in milligrams.
+```{r set_known}
+library(datasets)
+data("ToothGrowth")
+
+```
+##Summary
+```{r summary}
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+summary(ToothGrowth)
+```
+```{r sumary_plot}
+oj <- ToothGrowth[ToothGrowth$supp %in% c('OJ'),]
+vc <- ToothGrowth[ToothGrowth$supp %in% c('VC'),]
+plot(as.numeric(oj$dose), oj$len, col = 1, pch = 1, xlab = 'Dose (mg/day)', ylab = 'Length', main = '')
+points(as.numeric(vc$dose), vc$len, col = 2, pch = 2)
+legend('bottomright', c("OJ", "VC") ,bty = "n", pch = c(1,2), col = c(col = 1, col = 2))
+```
+
+Preliminary analysis shows a general trend of longer teeth with increasing dosage of both Orange Juice and Vitamin C. 
+
+##Confidence intervals
+```{r test}
+t.test(len ~ supp, data = ToothGrowth)
+
+```
+The p-value is larger than the 5% significance level so the null hypthosis cannot be rejected.
+```{r test2}
+data("ToothGrowth")
+t.test(ToothGrowth$len, ToothGrowth$dose)
+```
+When dosage is accounted for, the p-value becomes approximatly 0 and is smaller than the significance level. 
+
+##Conclusions
+The t-test results can be used to conclude that there is not a difference in tooth length based on the dosage of either VC or OJ but that the actual suppliment does not have a significant effect on tooth growth. 
